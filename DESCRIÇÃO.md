@@ -23,3 +23,5 @@ abordagens em relação a tempo de execução, utilização de memória (número
 na fronteira de espaço de estados), nós gerados, profundidade da solução,
 profundidade máxima atingida, admissibilidade (da heurística), se é ótima e se é
 completa.
+
+PRAZO DIA 29/10 !!!
