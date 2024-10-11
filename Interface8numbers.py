@@ -1,23 +1,26 @@
 import tkinter as tk
 import random
+import time
+import matplotlib.pyplot as plt
 from collections import deque
-import heapq  # Para a implementação da busca A*
+import heapq  # Pra busca A*
 
 class JogoDos8Numeros:
     def __init__(self, root):
         self.root = root
         self.root.title("Jogo dos 8 Números")
         self.movimentos = 0
-        self.modo_jogo = None  # Indica se é jogador ou IA
+        self.modo_jogo = None  # Pra saber se é jogador ou IA
         self.sequencia_vitoria = [1, 2, 3, 4, 5, 6, 7, 8, '']
-        self.caminho_solucao = []  # Para armazenar o caminho da solução
-        self.tabuleiro_inicial = []  # Guarda o estado inicial para o replay
+        self.caminho_solucao = []  # Caminho da solução
+        self.tabuleiro_inicial = []  # Guarda o estado inicial pro replay
+        self.tempo_execucao = {}  # Guarda os tempos de cada busca
 
-        # Menu inicial
+        # Chama o menu inicial
         self.menu_inicial()
 
     def menu_inicial(self):
-        """Exibe o menu inicial com as opções de jogo."""
+        """Menu inicial com as opções de jogo."""
         for widget in self.root.winfo_children():
             widget.destroy()
 
@@ -36,28 +39,38 @@ class JogoDos8Numeros:
         btn_estrela = tk.Button(self.root, text="Agente Inteligente (Busca A*)", command=lambda: self.iniciar_jogo_agente('a_estrela'))
         btn_estrela.pack(pady=10)
 
+        btn_relatorio = tk.Button(self.root, text="Gerar Relatório", command=self.gerar_relatorio)
+        btn_relatorio.pack(pady=10)
+
     def iniciar_jogo_jogador(self):
-        """Inicia o jogo no modo manual (jogador)."""
+        """Inicia o jogo no modo manual."""
         self.modo_jogo = 'jogador'
         self.iniciar_jogo()
 
     def iniciar_jogo_agente(self, tipo_busca):
-        """Inicia o jogo com a IA no modo busca cega (largura, profundidade ou A*)."""
+        """Inicia o jogo no modo IA (Largura, Profundidade ou A*)."""
         self.modo_jogo = tipo_busca
         self.iniciar_jogo()
 
         if self.modo_jogo == 'largura':
-            self.busca_em_largura()
+            self.tempo_execucao[self.modo_jogo] = self.registrar_tempo(self.busca_em_largura)
         elif self.modo_jogo == 'profundidade':
-            self.busca_em_profundidade()
+            self.tempo_execucao[self.modo_jogo] = self.registrar_tempo(self.busca_em_profundidade)
         elif self.modo_jogo == 'a_estrela':
-            self.busca_a_estrela()
+            self.tempo_execucao[self.modo_jogo] = self.registrar_tempo(self.busca_a_estrela)
+
+    def registrar_tempo(self, func):
+        """Mede o tempo de execução de uma busca."""
+        inicio = time.time()
+        func()
+        fim = time.time()
+        return fim - inicio
 
     def iniciar_jogo(self):
-        """Inicia o jogo comum, embaralha o tabuleiro e configura a interface."""
+        """Prepara o tabuleiro e a interface pro jogo começar."""
         self.movimentos = 0
         self.tabuleiro = self.embaralhar_tabuleiro()
-        self.tabuleiro_inicial = self.tabuleiro[:]  # Guarda o estado inicial para o replay
+        self.tabuleiro_inicial = self.tabuleiro[:]  # Guarda o estado inicial pro replay
         self.caminho_solucao = []
 
         for widget in self.root.winfo_children():
@@ -69,12 +82,12 @@ class JogoDos8Numeros:
             botao.grid(row=i//3, column=i%3)
             self.botoes.append(botao)
 
-        # Exibe contagem de movimentos
+        # Mostra a contagem de movimentos
         self.label_movimentos = tk.Label(self.root, text=f"Movimentos: {self.movimentos}", font=("Arial", 12))
         self.label_movimentos.grid(row=3, column=0, columnspan=3)
 
     def embaralhar_tabuleiro(self):
-        """Embaralha o tabuleiro garantindo uma configuração resolvível."""
+        """Embaralha o tabuleiro garantindo que seja resolvível."""
         while True:
             tabuleiro = [1, 2, 3, 4, 5, 6, 7, 8, '']
             random.shuffle(tabuleiro)
@@ -82,9 +95,9 @@ class JogoDos8Numeros:
                 return tabuleiro
 
     def eh_resolvivel(self, tabuleiro):
-        """Verifica se o tabuleiro é resolvível contando as inversões."""
+        """Verifica se o tabuleiro pode ser resolvido."""
         inversoes = 0
-        for i in range(8):  # Ignora o espaço vazio na última posição
+        for i in range(8):  # Ignora o espaço vazio
             for j in range(i + 1, 9):
                 if tabuleiro[i] != '' and tabuleiro[j] != '' and tabuleiro[i] > tabuleiro[j]:
                     inversoes += 1
@@ -97,7 +110,7 @@ class JogoDos8Numeros:
         self.label_movimentos.config(text=f"Movimentos: {self.movimentos}")
 
     def mover(self, i):
-        """Movimenta o número para o espaço vazio, se permitido."""
+        """Move o número pro espaço vazio, se puder."""
         index_vazio = self.tabuleiro.index('')
         movimentos_permitidos = {
             0: [1, 3], 1: [0, 2, 4], 2: [1, 5],
@@ -113,7 +126,7 @@ class JogoDos8Numeros:
                 self.vitoria()
 
     def busca_em_largura(self):
-        """Implementa a busca em largura para resolver o jogo."""
+        """Busca em Largura pra resolver o jogo."""
         fila = deque([(self.tabuleiro, [])])
         visitados = set()
 
@@ -133,9 +146,9 @@ class JogoDos8Numeros:
                     fila.append((novo_estado, caminho + [movimento]))
 
     def busca_em_profundidade(self):
-        """Implementa a busca em profundidade para resolver o jogo."""
+        """Busca em Profundidade pra resolver o jogo."""
         def profundidade_limitada(estado_atual, caminho, profundidade_maxima):
-            """Explora até a profundidade máxima."""
+            """Explora até uma profundidade máxima."""
             if estado_atual == self.sequencia_vitoria:
                 self.caminho_solucao = caminho
                 self.executar_caminho(caminho)
@@ -152,12 +165,12 @@ class JogoDos8Numeros:
                     return True
             return False
 
-        # Define uma profundidade máxima para evitar loops infinitos
+        # Limita a profundidade pra evitar loop infinito
         profundidade_maxima = 20
         profundidade_limitada(self.tabuleiro, [], profundidade_maxima)
 
     def busca_a_estrela(self):
-        """Implementa a busca A* para resolver o jogo."""
+        """Busca A* pra resolver o jogo."""
         def heuristica(estado_atual):
             """Calcula a distância de Manhattan como heurística."""
             distancia = 0
@@ -188,7 +201,7 @@ class JogoDos8Numeros:
                     heapq.heappush(prioridade, (heuristica(novo_estado) + len(caminho) + 1, novo_estado, caminho + [movimento]))
 
     def movimentos_permitidos(self, index_vazio):
-        """Retorna a lista de movimentos permitidos com base na posição do vazio."""
+        """Retorna os movimentos permitidos pro vazio."""
         return {
             0: [1, 3], 1: [0, 2, 4], 2: [1, 5],
             3: [0, 4, 6], 4: [1, 3, 5, 7], 5: [2, 4, 8],
@@ -196,18 +209,18 @@ class JogoDos8Numeros:
         }[index_vazio]
 
     def executar_caminho(self, caminho, replay=False):
-        """Executa o caminho encontrado pela busca. O parâmetro replay desativa a contagem de movimentos."""
-        self.movimentos_iniciais = self.movimentos  # Armazena a contagem inicial
+        """Executa o caminho da busca. Se for replay, não conta movimentos."""
+        self.movimentos_iniciais = self.movimentos  # Guarda a contagem inicial
         for movimento in caminho:
             self.mover(movimento)
             self.root.update()
             self.root.after(500)
         if replay:
-            self.movimentos = self.movimentos_iniciais  # Restaura o número de movimentos após o replay
+            self.movimentos = self.movimentos_iniciais  # Mantém o número de movimentos no replay
         self.opcoes_pos_execucao()
 
     def opcoes_pos_execucao(self):
-        """Exibe opções após a execução do jogo: reiniciar, repetir ou novo tabuleiro."""
+        """Mostra as opções depois que a busca termina."""
         opcoes_frame = tk.Frame(self.root)
         opcoes_frame.grid(row=4, column=0, columnspan=3, pady=10)
 
@@ -221,25 +234,46 @@ class JogoDos8Numeros:
         btn_menu.pack(side="left", padx=5)
 
     def replay_caminho(self):
-        """Executa o replay do caminho da solução sem alterar a contagem de movimentos."""
+        """Refaz o caminho sem contar os movimentos."""
         self.tabuleiro = self.tabuleiro_inicial[:]  # Restaura o estado inicial
         self.atualizar_botoes()
         self.root.after(500, lambda: self.executar_caminho(self.caminho_solucao, replay=True))
 
     def vitoria(self):
-        """Exibe a tela de vitória com confetes e reinicia o jogo."""
+        """Mostra a animação de vitória com confetes."""
         for botao in self.botoes:
             botao.config(bg="lightgreen")
         self.root.after(1000, self.animacao_confetes)
 
     def animacao_confetes(self):
-        """Animação de confetes caindo."""
+        """Animação de confetes."""
         cores = ["red", "blue", "yellow", "green", "purple"]
         for i in range(9):
             self.botoes[i].config(bg=random.choice(cores))
 
-        # Alterna as cores algumas vezes
         self.root.after(500, lambda: self.animacao_confetes() if self.movimentos < 20 else self.opcoes_pos_execucao())
+
+    def gerar_relatorio(self):
+        """Gera um relatório com gráficos dos tempos de execução."""
+        if not self.tempo_execucao:
+            tk.messagebox.showinfo("Relatório", "Nenhuma execução registrada. Execute pelo menos uma busca.")
+            return
+        
+        # Gera o gráfico de tempos
+        algoritmos = list(self.tempo_execucao.keys())
+        tempos = list(self.tempo_execucao.values())
+
+        plt.figure(figsize=(8, 6))
+        plt.bar(algoritmos, tempos, color=['blue', 'green', 'red'])
+        plt.xlabel('Algoritmos de Busca')
+        plt.ylabel('Tempo de Execução (segundos)')
+        plt.title('Comparação de Tempos de Execução dos Algoritmos')
+        
+        # Salva o gráfico como imagem
+        plt.savefig('relatorio_buscas.png')
+        plt.show()
+
+        tk.messagebox.showinfo("Relatório", "Relatório gerado e salvo como 'relatorio_buscas.png'.")
 
 if __name__ == "__main__":
     root = tk.Tk()
