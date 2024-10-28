@@ -36,6 +36,9 @@ class JogoDos8Numeros:
         btn_profundidade = tk.Button(self.root, text="Agente Inteligente (Busca em Profundidade)", command=lambda: self.iniciar_jogo_agente('profundidade'))
         btn_profundidade.pack(pady=10)
 
+        btn_estrela = tk.Button(self.root, text="Agente Inteligente (Busca Heuristica Gulosa)", command=lambda: self.iniciar_jogo_agente('gulosa'))
+        btn_estrela.pack(pady=10)
+
         btn_estrela = tk.Button(self.root, text="Agente Inteligente (Busca A*)", command=lambda: self.iniciar_jogo_agente('a_estrela'))
         btn_estrela.pack(pady=10)
 
@@ -58,6 +61,8 @@ class JogoDos8Numeros:
             self.tempo_execucao[self.modo_jogo] = self.registrar_tempo(self.busca_em_profundidade)
         elif self.modo_jogo == 'a_estrela':
             self.tempo_execucao[self.modo_jogo] = self.registrar_tempo(self.busca_a_estrela)
+        elif self.modo_jogo == 'gulosa':
+            self.tempo_execucao[self.modo_jogo] = self.registrar_tempo(self.busca_gulosa)
 
     def registrar_tempo(self, func):
         """Mede o tempo de execução de uma busca."""
@@ -203,6 +208,42 @@ class JogoDos8Numeros:
                     novo_estado[index_vazio], novo_estado[movimento] = novo_estado[movimento], novo_estado[index_vazio]
                     novo_custo = custo + 1
                     heapq.heappush(fila, (novo_custo + h(novo_estado), novo_custo, novo_estado, caminho + [movimento]))
+
+    def busca_gulosa(self):
+        """Busca Gulosa para resolver o jogo."""
+        def h(estado):
+            """Função heurística: número de peças fora do lugar."""
+            return sum(1 for i, j in zip(estado, self.sequencia_vitoria) if i != j and i != 0)
+
+        # Substitui '' por 0 temporariamente no tabuleiro para facilitar a comparação
+        tabuleiro_numerico = [0 if x == '' else x for x in self.tabuleiro]
+        sequencia_vitoria_numerica = [0 if x == '' else x for x in self.sequencia_vitoria]
+
+        # Inicializa a fila de prioridade com o tabuleiro convertido
+        fila = [(h(tabuleiro_numerico), tabuleiro_numerico, [])]
+        visitados = set()
+
+        while fila:
+            _, estado_atual, caminho = heapq.heappop(fila)
+
+            # Verifica se o estado atual é o estado de vitória
+            if estado_atual == sequencia_vitoria_numerica:
+                self.caminho_solucao = caminho
+                # Restaura a interface do tabuleiro para exibir '' ao invés de 0
+                self.executar_caminho(caminho)
+                return
+
+            # Adiciona o estado atual aos visitados
+            estado_tupla = tuple(estado_atual)
+            if estado_tupla not in visitados:
+                visitados.add(estado_tupla)
+                index_vazio = estado_atual.index(0)  # Usa 0 para o espaço vazio
+                for movimento in self.movimentos_permitidos(index_vazio):
+                    novo_estado = estado_atual[:]
+                    novo_estado[index_vazio], novo_estado[movimento] = novo_estado[movimento], novo_estado[index_vazio]
+                    # Adiciona o novo estado à fila com sua heurística
+                    heapq.heappush(fila, (h(novo_estado), novo_estado, caminho + [movimento]))
+
 
     def animacao_confetes(self):
         """Mostra uma animação de confetes na tela."""
