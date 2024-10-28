@@ -245,13 +245,6 @@ class JogoDos8Numeros:
             botao.config(bg="lightgreen")
         self.root.after(1000, self.animacao_confetes)
 
-    def animacao_confetes(self):
-        """Animação de confetes."""
-        cores = ["red", "blue", "yellow", "green", "purple"]
-        for i in range(9):
-            self.botoes[i].config(bg=random.choice(cores))
-
-        self.root.after(500, lambda: self.animacao_confetes() if self.movimentos < 20 else self.opcoes_pos_execucao())
 
     def gerar_relatorio(self):
         """Gera um relatório com gráficos dos tempos de execução."""
