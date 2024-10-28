@@ -169,36 +169,52 @@ class JogoDos8Numeros:
         profundidade_maxima = 20
         profundidade_limitada(self.tabuleiro, [], profundidade_maxima)
 
+    
     def busca_a_estrela(self):
-        """Busca A* pra resolver o jogo."""
-        def heuristica(estado_atual):
-            """Calcula a distância de Manhattan como heurística."""
-            distancia = 0
-            for i in range(9):
-                if estado_atual[i] != '' and estado_atual[i] != self.sequencia_vitoria[i]:
-                    valor = estado_atual[i]
-                    pos_atual = (i // 3, i % 3)
-                    pos_objetivo = ((valor - 1) // 3, (valor - 1) % 3)
-                    distancia += abs(pos_atual[0] - pos_objetivo[0]) + abs(pos_atual[1] - pos_objetivo[1])
-            return distancia
+        """Busca A* para resolver o jogo."""
+        def h(estado):
+            """Função heurística: número de peças fora do lugar."""
+            return sum(1 for i, j in zip(estado, self.sequencia_vitoria) if i != j and i != 0)
 
-        prioridade = [(heuristica(self.tabuleiro), self.tabuleiro, [])]
+        # Substitui '' por 0 temporariamente para facilitar a comparação
+        tabuleiro_numerico = [0 if x == '' else x for x in self.tabuleiro]
+        sequencia_vitoria_numerica = [0 if x == '' else x for x in self.sequencia_vitoria]
+
+        # Converte o estado inicial para tupla e adiciona à fila
+        fila = [(h(tabuleiro_numerico), 0, tabuleiro_numerico, [])]
         visitados = set()
 
-        while prioridade:
-            _, estado_atual, caminho = heapq.heappop(prioridade)
-            if estado_atual == self.sequencia_vitoria:
+        while fila:
+            _, custo, estado_atual, caminho = heapq.heappop(fila)
+            
+            if estado_atual == sequencia_vitoria_numerica:
                 self.caminho_solucao = caminho
-                self.executar_caminho(caminho)
+                # Restaura o tabuleiro para exibir '' no lugar do 0
+                self.executar_caminho([movimento for movimento in caminho])
                 return
 
-            if tuple(estado_atual) not in visitados:
-                visitados.add(tuple(estado_atual))
-                index_vazio = estado_atual.index('')
+            # Converte o estado atual para tupla para evitar duplicatas
+            estado_tupla = tuple(estado_atual)
+            if estado_tupla not in visitados:
+                visitados.add(estado_tupla)
+                index_vazio = estado_atual.index(0)  # Usa 0 para o vazio
                 for movimento in self.movimentos_permitidos(index_vazio):
                     novo_estado = estado_atual[:]
                     novo_estado[index_vazio], novo_estado[movimento] = novo_estado[movimento], novo_estado[index_vazio]
-                    heapq.heappush(prioridade, (heuristica(novo_estado) + len(caminho) + 1, novo_estado, caminho + [movimento]))
+                    novo_custo = custo + 1
+                    heapq.heappush(fila, (novo_custo + h(novo_estado), novo_custo, novo_estado, caminho + [movimento]))
+
+    def animacao_confetes(self):
+        """Mostra uma animação de confetes na tela."""
+        for botao in self.botoes:
+            botao.config(bg="lightgreen")
+        for _ in range(100):
+            x = random.randint(0, 300)
+            y = random.randint(0, 300)
+            confete = tk.Label(self.root, text="🎉", font=("Arial", 20), fg="blue", bg="lightgreen")
+            confete.place(x=x, y=y)
+            self.root.update()
+            self.root.after(100, confete.destroy)
 
     def movimentos_permitidos(self, index_vazio):
         """Retorna os movimentos permitidos pro vazio."""
