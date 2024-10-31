@@ -204,12 +204,12 @@ class JogoDos8Numeros:
             if estado_atual == self.sequencia_vitoria:
                 profundidade_solucao = len(caminho)
                 self.caminho_solucao = caminho
-                self.executar_caminho(caminho)
                 self.resultados[0][0] = custo_de_tempo
                 self.resultados[0][1] = custo_de_espaço
                 self.resultados[0][2] = nos_gerados
                 self.resultados[0][3] = profundidade_busca
                 self.resultados[0][4] = profundidade_solucao
+                self.executar_caminho(caminho)
                 return
 
             nos_gerados+=1
@@ -250,12 +250,12 @@ class JogoDos8Numeros:
             if estado_atual == self.sequencia_vitoria:
                 profundidade_solucao = profundidade_atual
                 self.caminho_solucao = caminho
-                self.executar_caminho(caminho)
                 self.resultados[1][0] = custo_de_tempo
                 self.resultados[1][1] = custo_de_espaço
                 self.resultados[1][2] = nos_gerados
                 self.resultados[1][3] = profundidade_busca
                 self.resultados[1][4] = profundidade_solucao
+                self.executar_caminho(caminho)
                 return
 
             nos_gerados += 1
@@ -301,12 +301,12 @@ class JogoDos8Numeros:
             if estado_atual == sequencia_vitoria_numerica:
                 profundidade_solucao = len(caminho)
                 self.caminho_solucao = caminho
-                self.executar_caminho([movimento for movimento in caminho])
                 self.resultados[2][0] = custo_de_tempo
                 self.resultados[2][1] = custo_de_espaço
                 self.resultados[2][2] = nos_gerados
                 self.resultados[2][3] = profundidade_busca
                 self.resultados[2][4] = profundidade_solucao
+                self.executar_caminho([movimento for movimento in caminho])
                 return
             
             nos_gerados += 1
@@ -354,12 +354,12 @@ class JogoDos8Numeros:
                 profundidade_solucao = len(caminho)
                 self.caminho_solucao = caminho
                 # Restaura a interface do tabuleiro para exibir '' ao invés de 0
-                self.executar_caminho(caminho)
                 self.resultados[3][0] = custo_de_tempo
                 self.resultados[3][1] = custo_de_espaço
                 self.resultados[3][2] = nos_gerados
                 self.resultados[3][3] = profundidade_busca
                 self.resultados[3][4] = profundidade_solucao
+                self.executar_caminho(caminho)
                 return
 
             nos_gerados += 1
@@ -413,7 +413,41 @@ class JogoDos8Numeros:
         opcoes_frame = tk.Frame(self.root)
         opcoes_frame.grid(row=4, column=0, columnspan=3, pady=10)
 
-
+        # mostrando os resultados segundo o tipo de busca escolhida
+        if self.modo_jogo == 'largura':
+            print(self.resultados[0])
+            resultados = self.resultados[0]
+            tk.Label(opcoes_frame, text=f"Tempo de Execução: {resultados[0]} nos visitados").pack()
+            tk.Label(opcoes_frame, text=f"Custo de Tempo: {resultados[0]}").pack()
+            tk.Label(opcoes_frame, text=f"Custo de Espaço: {resultados[1]}").pack()
+            tk.Label(opcoes_frame, text=f"Nós Gerados: {resultados[2]}").pack()
+            tk.Label(opcoes_frame, text=f"Profundidade da Busca: {resultados[3]}").pack()
+            tk.Label(opcoes_frame, text=f"Profundidade da Solução: {resultados[4]}").pack()
+        elif self.modo_jogo == 'profundidade':
+            resultados = self.resultados[1]
+            tk.Label(opcoes_frame, text=f"Tempo de Execução: {resultados[0]} nos visitados").pack()
+            tk.Label(opcoes_frame, text=f"Custo de Tempo: {resultados[0]}").pack()
+            tk.Label(opcoes_frame, text=f"Custo de Espaço: {resultados[1]}").pack()
+            tk.Label(opcoes_frame, text=f"Nós Gerados: {resultados[2]}").pack()
+            tk.Label(opcoes_frame, text=f"Profundidade da Busca: {resultados[3]}").pack()
+            tk.Label(opcoes_frame, text=f"Profundidade da Solução: {resultados[4]}").pack()
+        elif self.modo_jogo == 'a_estrela':
+            resultados = self.resultados[2]
+            tk.Label(opcoes_frame, text=f"Tempo de Execução: {resultados[0]} nos visitados").pack()
+            tk.Label(opcoes_frame, text=f"Custo de Tempo: {resultados[0]}").pack()
+            tk.Label(opcoes_frame, text=f"Custo de Espaço: {resultados[1]}").pack()
+            tk.Label(opcoes_frame, text=f"Nós Gerados: {resultados[2]}").pack()
+            tk.Label(opcoes_frame, text=f"Profundidade da Busca: {resultados[3]}").pack()
+            tk.Label(opcoes_frame, text=f"Profundidade da Solução: {resultados[4]}").pack()
+        elif self.modo_jogo == 'gulosa':
+            resultados = self.resultados[3]
+            tk.Label(opcoes_frame, text=f"Tempo de Execução: {resultados[0]} nos visitados").pack()
+            tk.Label(opcoes_frame, text=f"Custo de Tempo: {resultados[0]}").pack()
+            tk.Label(opcoes_frame, text=f"Custo de Espaço: {resultados[1]}").pack()
+            tk.Label(opcoes_frame, text=f"Nós Gerados: {resultados[2]}").pack()
+            tk.Label(opcoes_frame, text=f"Profundidade da Busca: {resultados[3]}").pack()
+            tk.Label(opcoes_frame, text=f"Profundidade da Solução: {resultados[4]}").pack()
+        
         btn_menu = tk.Button(opcoes_frame, text="Voltar ao Menu", command=self.retorna_estado_inicial)
         btn_menu.pack(side="left", padx=5)
 
