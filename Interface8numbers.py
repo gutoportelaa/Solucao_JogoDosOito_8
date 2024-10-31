@@ -463,26 +463,38 @@ class JogoDos8Numeros:
 
 
     def gerar_relatorio(self):
-        """Gera um relatório com gráficos dos tempos de execução."""
+        for widget in self.root.winfo_children():
+            widget.destroy()
+
+        label = tk.Label(self.root, text="Relatório de Desempenho", font=("Arial", 14))
+        label.pack(pady=20)
+
         if not self.tempo_execucao:
-            tk.messagebox.showinfo("Relatório", "Nenhuma execução registrada. Execute pelo menos uma busca.")
+            tk.Label(self.root, text="Nenhum relatório disponível.").pack()
+            btn_menu = tk.Button(self.root, text="Voltar ao Menu", command=self.menu_inicial)
+            btn_menu.pack(pady=10)
             return
-        
-        # Gera o gráfico de tempos
-        algoritmos = list(self.tempo_execucao.keys())
-        tempos = list(self.tempo_execucao.values())
 
-        plt.figure(figsize=(8, 6))
-        plt.bar(algoritmos, tempos, color=['blue', 'green', 'red'])
-        plt.xlabel('Algoritmos de Busca')
-        plt.ylabel('Tempo de Execução (segundos)')
-        plt.title('Comparação de Tempos de Execução dos Algoritmos')
-        
-        # Salva o gráfico como imagem
-        plt.savefig('relatorio_buscas.png')
-        plt.show()
+        # Mostra os resultados de cada busca e destacando o titulo de cada busca
+        for i, resultados in enumerate(self.resultados):
+            if i == 0:
+                titulo = "Busca em Largura"
+            elif i == 1:
+                titulo = "Busca em Profundidade"
+            elif i == 2:
+                titulo = "Busca A*"
+            elif i == 3:
+                titulo = "Busca Gulosa"
+            tk.Label(self.root, text=titulo, font=("Arial", 12, "bold")).pack()
+            tk.Label(self.root, text=f"Tempo de Execução: {resultados[0]} nos visitados").pack()
+            tk.Label(self.root, text=f"Custo de Tempo: {resultados[0]}").pack()
+            tk.Label(self.root, text=f"Custo de Espaço: {resultados[1]}").pack()
+            tk.Label(self.root, text=f"Nós Gerados: {resultados[2]}").pack()
+            tk.Label(self.root, text=f"Profundidade da Busca: {resultados[3]}").pack()
+            tk.Label(self.root, text=f"Profundidade da Solução: {resultados[4]}").pack()
 
-        tk.messagebox.showinfo("Relatório", "Relatório gerado e salvo como 'relatorio_buscas.png'.")
+        btn_menu = tk.Button(self.root, text="Voltar ao Menu", command=self.menu_inicial)
+        btn_menu.pack(pady=10)
 
 if __name__ == "__main__":
     root = tk.Tk()
