@@ -131,7 +131,7 @@ class JogoDos8Numeros:
     def iniciar_jogo(self):
         """Prepara o tabuleiro e a interface pro jogo começar."""
         self.movimentos = 0
-        if self.tabuleiro == []:
+        if self.tabuleiro.count('') != 1:
             self.tabuleiro = self.embaralhar_tabuleiro()
         self.tabuleiro_inicial = self.tabuleiro[:]  # Guarda o estado inicial pro replay
         self.caminho_solucao = []
