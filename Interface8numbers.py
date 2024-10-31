@@ -210,7 +210,6 @@ class JogoDos8Numeros:
                 self.resultados[0][2] = nos_gerados
                 self.resultados[0][3] = profundidade_busca
                 self.resultados[0][4] = profundidade_solucao
-                print(self.resultados[0])
                 return
 
             nos_gerados+=1
@@ -231,50 +230,58 @@ class JogoDos8Numeros:
 
 
     def busca_em_profundidade(self):
-    
-        profundidade_maxima = 100  # Limite para evitar loops infinitos
-        arvore_busca = {}
+        custo_de_tempo = 0
+        custo_de_espaço = 0
+        nos_gerados = 0
+        profundidade_busca = 0
+        profundidade_solucao = 0
+        profundidade_maxima = 50  # Defina um limite razoável para a profundidade
 
+        pilha = [(self.tabuleiro, [])]
+        visitados = set()
 
-        def profundidade_limitada(estado_atual, caminho, profundidade):
-            """Explora até uma profundidade máxima."""
-            # Verifica se atingiu o estado de vitória
+        while pilha:
+            estado_atual, caminho = pilha.pop()
+            profundidade_atual = len(caminho)
+
+            if profundidade_atual > profundidade_maxima:
+                continue  # Ignora se ultrapassar o limite de profundidade
+
             if estado_atual == self.sequencia_vitoria:
+                profundidade_solucao = profundidade_atual
                 self.caminho_solucao = caminho
                 self.executar_caminho(caminho)
-                return True
+                self.resultados[1][0] = custo_de_tempo
+                self.resultados[1][1] = custo_de_espaço
+                self.resultados[1][2] = nos_gerados
+                self.resultados[1][3] = profundidade_busca
+                self.resultados[1][4] = profundidade_solucao
+                return
 
-            # Limite de profundidade para evitar loops infinitos
-            if profundidade >= profundidade_maxima:
-                return False
-
-            # Marca o estado atual como visitado
+            nos_gerados += 1
+            custo_de_tempo += 1
             visitados.add(tuple(estado_atual))
-            index_vazio = estado_atual.index('')
 
-            # Explora movimentos possíveis a partir do estado atual
-            for movimento in self.movimentos_permitidos(index_vazio):
+            index_vazio = estado_atual.index('')
+            for movimento in reversed(self.movimentos_permitidos(index_vazio)):
                 novo_estado = estado_atual[:]
                 novo_estado[index_vazio], novo_estado[movimento] = novo_estado[movimento], novo_estado[index_vazio]
-                # Chama a função recursiva se o novo estado ainda não foi visitado
+
                 if tuple(novo_estado) not in visitados:
-                    arvore_atual = arvore_busca     #cosntrução da árvore de busca
-                    for m in caminho:
-                        arvore_atual = arvore_atual.setdefault(m, {})
-                    arvore_atual[movimento] = novo_estado
-                    if profundidade_limitada(novo_estado, caminho + [movimento], profundidade + 1):
-                        return True
+                    pilha.append((novo_estado, caminho + [movimento]))
 
-            # Remove o estado atual dos visitados ao retroceder
-            visitados.remove(tuple(estado_atual))
-            return False
-
-        # Inicializa o conjunto de estados visitados e executa a busca
-        visitados = set()
-        profundidade_limitada(self.tabuleiro, [], 0)
+            custo_de_espaço = max(custo_de_espaço, len(pilha))
+            profundidade_busca = max(profundidade_busca, profundidade_atual)
 
     
     def busca_a_estrela(self):
+
+        custo_de_tempo = 0
+        custo_de_espaço = 0
+        nos_gerados = 0
+        profundidade_busca = 0
+        profundidade_solucao = 0
+
 
         def h(estado):           #Função heurística: número de peças fora do lugar.
 
@@ -292,15 +299,23 @@ class JogoDos8Numeros:
             _, custo, estado_atual, caminho = heapq.heappop(fila)
             
             if estado_atual == sequencia_vitoria_numerica:
+                profundidade_solucao = len(caminho)
                 self.caminho_solucao = caminho
-                # Restaura o tabuleiro para exibir '' no lugar do 0
                 self.executar_caminho([movimento for movimento in caminho])
+                self.resultados[2][0] = custo_de_tempo
+                self.resultados[2][1] = custo_de_espaço
+                self.resultados[2][2] = nos_gerados
+                self.resultados[2][3] = profundidade_busca
+                self.resultados[2][4] = profundidade_solucao
                 return
+            
+            nos_gerados += 1
 
             # Converte o estado atual para tupla para evitar duplicatas
             estado_tupla = tuple(estado_atual)
             if estado_tupla not in visitados:
                 visitados.add(estado_tupla)
+                custo_de_tempo += 1
                 index_vazio = estado_atual.index(0)  # Usa 0 para o vazio
                 for movimento in self.movimentos_permitidos(index_vazio):
                     novo_estado = estado_atual[:]
@@ -308,7 +323,17 @@ class JogoDos8Numeros:
                     novo_custo = custo + 1
                     heapq.heappush(fila, (novo_custo + h(novo_estado), novo_custo, novo_estado, caminho + [movimento]))
 
+            custo_de_espaço = max(custo_de_espaço, len(fila))
+            profundidade_busca = max(profundidade_busca, len(caminho))
+
+
     def busca_gulosa(self):
+
+        custo_de_tempo = 0
+        custo_de_espaço = 0
+        nos_gerados = 0
+        profundidade_busca = 0
+        profundidade_solucao = 0
 
         def h(estado):
             return sum(1 for i, j in zip(estado, self.sequencia_vitoria) if i != j and i != 0)
@@ -326,14 +351,23 @@ class JogoDos8Numeros:
 
             # Verifica se o estado atual é o estado de vitória
             if estado_atual == sequencia_vitoria_numerica:
+                profundidade_solucao = len(caminho)
                 self.caminho_solucao = caminho
                 # Restaura a interface do tabuleiro para exibir '' ao invés de 0
                 self.executar_caminho(caminho)
+                self.resultados[3][0] = custo_de_tempo
+                self.resultados[3][1] = custo_de_espaço
+                self.resultados[3][2] = nos_gerados
+                self.resultados[3][3] = profundidade_busca
+                self.resultados[3][4] = profundidade_solucao
                 return
+
+            nos_gerados += 1
 
             # Adiciona o estado atual aos visitados
             estado_tupla = tuple(estado_atual)
             if estado_tupla not in visitados:
+                custo_de_tempo += 1
                 visitados.add(estado_tupla)
                 index_vazio = estado_atual.index(0)  # Usa 0 para o espaço vazio
                 for movimento in self.movimentos_permitidos(index_vazio):
@@ -341,6 +375,9 @@ class JogoDos8Numeros:
                     novo_estado[index_vazio], novo_estado[movimento] = novo_estado[movimento], novo_estado[index_vazio]
                     # Adiciona o novo estado à fila com sua heurística
                     heapq.heappush(fila, (h(novo_estado), novo_estado, caminho + [movimento]))
+
+            custo_de_espaço = max(custo_de_espaço, len(fila))
+            profundidade_busca = max(profundidade_busca, len(caminho))
 
 
     def animacao_confetes(self):
