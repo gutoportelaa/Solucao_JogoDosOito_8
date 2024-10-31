@@ -506,8 +506,7 @@ class JogoDos8Numeros:
                 elif i == 3:
                     titulo = "Busca Gulosa"
                 arquivo.write(f"{titulo}\n")
-                arquivo.write(f"Tempo de Execução: {resultados[0]} nos visitados\n")
-                arquivo.write(f"Custo de Tempo: {resultados[0]}\n")
+                arquivo.write(f"Custo de Tempo: {resultados[0]} nos visitados\n")
                 arquivo.write(f"Custo de Espaço: {resultados[1]}\n")
                 arquivo.write(f"Nós Gerados: {resultados[2]}\n")
                 arquivo.write(f"Profundidade da Busca: {resultados[3]}\n")
