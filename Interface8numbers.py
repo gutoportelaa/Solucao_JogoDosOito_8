@@ -15,6 +15,7 @@ class JogoDos8Numeros:
         self.caminho_solucao = []  # Caminho da solução
         self.tabuleiro_inicial = []  # Guarda o estado inicial pro replay
         self.tempo_execucao = {}  # Guarda os tempos de cada busca
+        self.tabuleiro = []  
 
         # Chama o menu inicial
         self.menu_inicial()
@@ -26,6 +27,9 @@ class JogoDos8Numeros:
 
         label = tk.Label(self.root, text="Escolha o modo de jogo:", font=("Arial", 14))
         label.pack(pady=20)
+
+        btn_definirTabuleiro = tk.Button(self.root, text="Definir Tabuleiro", command=self.definir_tabuleiro)
+        btn_definirTabuleiro.pack(pady=10)
 
         btn_jogar = tk.Button(self.root, text="Jogar Manualmente", command=self.iniciar_jogo_jogador)
         btn_jogar.pack(pady=10)
@@ -43,7 +47,60 @@ class JogoDos8Numeros:
         btn_estrela.pack(pady=10)
 
         btn_relatorio = tk.Button(self.root, text="Gerar Relatório", command=self.gerar_relatorio)
-        btn_relatorio.pack(pady=10)
+        btn_relatorio.pack(pady=10) 
+
+    def retorna_estado_inicial(self):
+        """Retorna o estado inicial do tabuleiro."""
+        self.tabuleiro = self.tabuleiro_inicial[:]
+        self.atualizar_botoes() 
+        self.menu_inicial()   
+
+    def definir_tabuleiro(self):
+        """Permite o usuário definir o tabuleiro manualmente."""
+        for widget in self.root.winfo_children():
+            widget.destroy()
+
+        label = tk.Label(self.root, text="Digite os números do tabuleiro (0 a 8, sendo 0 o espaço vazio):", font=("Arial", 14))
+        label.pack(pady=20)
+
+        self.entradas = []
+        
+        for i in range(3):
+            frame = tk.Frame(self.root)
+            frame.pack()
+            for j in range(3):
+                entrada = tk.Entry(frame, width=5, font=("Arial", 12))
+                entrada.grid(row=i, column=j, padx=5, pady=5)
+                self.entradas.append(entrada)
+
+        btn_confirmar = tk.Button(self.root, text="Confirmar", command=self.confirmar_tabuleiro)
+        btn_confirmar.pack(pady=10)
+
+        btn_voltar = tk.Button(self.root, text="Voltar ao Menu", command=self.menu_inicial)
+        btn_voltar.pack(pady=10)
+
+        
+
+    def confirmar_tabuleiro(self):
+        """Confirma o tabuleiro definido manualmente pelo usuário."""
+        tabuleiro = []
+        for entrada in self.entradas:
+            try:
+                numero = int(entrada.get())
+                if numero < 0 or numero > 8:
+                    raise ValueError
+                if numero == 0:
+                    numero = ''
+                tabuleiro.append(numero)
+            except ValueError:
+                tk.Message(self.root, text="Digite apenas números de 0 a 8.", font=("Arial", 12)).pack(pady=10)
+                return
+        
+        if self.eh_resolvivel(tabuleiro):
+            self.tabuleiro = tabuleiro
+            self.tabuleiro_inicial = self.tabuleiro[:]  # Guarda o estado inicial pro replay
+
+        self.menu_inicial()
 
     def iniciar_jogo_jogador(self):
         """Inicia o jogo no modo manual."""
@@ -74,7 +131,8 @@ class JogoDos8Numeros:
     def iniciar_jogo(self):
         """Prepara o tabuleiro e a interface pro jogo começar."""
         self.movimentos = 0
-        self.tabuleiro = self.embaralhar_tabuleiro()
+        if self.tabuleiro == []:
+            self.tabuleiro = self.embaralhar_tabuleiro()
         self.tabuleiro_inicial = self.tabuleiro[:]  # Guarda o estado inicial pro replay
         self.caminho_solucao = []
 
@@ -152,27 +210,28 @@ class JogoDos8Numeros:
 
     def busca_em_profundidade(self):
         """Busca em Profundidade pra resolver o jogo."""
-        def profundidade_limitada(estado_atual, caminho, profundidade_maxima):
-            """Explora até uma profundidade máxima."""
+        def dfs(estado_atual, caminho):
+            """Função recursiva de busca em profundidade."""
             if estado_atual == self.sequencia_vitoria:
                 self.caminho_solucao = caminho
                 self.executar_caminho(caminho)
                 return True
 
-            if len(caminho) >= profundidade_maxima:
+            if tuple(estado_atual) in visitados or len(caminho) > 20:
                 return False
 
+            visitados.add(tuple(estado_atual))
             index_vazio = estado_atual.index('')
             for movimento in self.movimentos_permitidos(index_vazio):
                 novo_estado = estado_atual[:]
                 novo_estado[index_vazio], novo_estado[movimento] = novo_estado[movimento], novo_estado[index_vazio]
-                if profundidade_limitada(novo_estado, caminho + [movimento], profundidade_maxima):
+                if dfs(novo_estado, caminho + [movimento]):
                     return True
+
             return False
 
-        # Limita a profundidade pra evitar loop infinito
-        profundidade_maxima = 20
-        profundidade_limitada(self.tabuleiro, [], profundidade_maxima)
+        visitados = set()
+        dfs(self.tabuleiro, [])
 
     
     def busca_a_estrela(self):
@@ -281,13 +340,10 @@ class JogoDos8Numeros:
         opcoes_frame = tk.Frame(self.root)
         opcoes_frame.grid(row=4, column=0, columnspan=3, pady=10)
 
-        btn_replay = tk.Button(opcoes_frame, text="Repetir Caminho (Replay)", command=lambda: self.replay_caminho())
+        btn_replay = tk.Button(opcoes_frame, text="Repetir Caminho (Replay)", command=lambda: self.replay_caminho)
         btn_replay.pack(side="left", padx=5)
 
-        btn_novo_tabuleiro = tk.Button(opcoes_frame, text="Novo Tabuleiro", command=self.iniciar_jogo)
-        btn_novo_tabuleiro.pack(side="left", padx=5)
-
-        btn_menu = tk.Button(opcoes_frame, text="Voltar ao Menu", command=self.menu_inicial)
+        btn_menu = tk.Button(opcoes_frame, text="Voltar ao Menu", command=self.retorna_estado_inicial)
         btn_menu.pack(side="left", padx=5)
 
     def replay_caminho(self):
