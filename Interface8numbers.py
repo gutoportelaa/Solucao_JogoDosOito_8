@@ -199,7 +199,10 @@ class JogoDos8Numeros:
         fila = deque([(self.tabuleiro, [])])
         visitados = set()
 
+       
+
         while fila:
+             
             estado_atual, caminho = fila.popleft()
             if estado_atual == self.sequencia_vitoria:
                 profundidade_solucao = len(caminho)
@@ -415,6 +418,7 @@ class JogoDos8Numeros:
 
         # mostrando os resultados segundo o tipo de busca escolhida
         if self.modo_jogo == 'largura':
+            resultados = self.resultados[0]
             tk.Label(opcoes_frame, text=f"Tempo de Execução: {resultados[0]} nos visitados").pack()
             tk.Label(opcoes_frame, text=f"Custo de Tempo: {resultados[0]}").pack()
             tk.Label(opcoes_frame, text=f"Custo de Espaço: {resultados[1]}").pack()
