@@ -496,6 +496,26 @@ class JogoDos8Numeros:
         btn_menu = tk.Button(self.root, text="Voltar ao Menu", command=self.menu_inicial)
         btn_menu.pack(pady=10)
 
+        #salvando os resultados em um arquivo
+        with open("relatorio.txt", "w") as arquivo:
+            arquivo.write("Relatório de Desempenho\n")
+            for i, resultados in enumerate(self.resultados):
+                if i == 0:
+                    titulo = "Busca em Largura"
+                elif i == 1:
+                    titulo = "Busca em Profundidade"
+                elif i == 2:
+                    titulo = "Busca A*"
+                elif i == 3:
+                    titulo = "Busca Gulosa"
+                arquivo.write(f"{titulo}\n")
+                arquivo.write(f"Tempo de Execução: {resultados[0]} nos visitados\n")
+                arquivo.write(f"Custo de Tempo: {resultados[0]}\n")
+                arquivo.write(f"Custo de Espaço: {resultados[1]}\n")
+                arquivo.write(f"Nós Gerados: {resultados[2]}\n")
+                arquivo.write(f"Profundidade da Busca: {resultados[3]}\n")
+                arquivo.write(f"Profundidade da Solução: {resultados[4]}\n\n")
+
 if __name__ == "__main__":
     root = tk.Tk()
     app = JogoDos8Numeros(root)
