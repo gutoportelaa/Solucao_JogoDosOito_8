@@ -78,9 +78,7 @@ class JogoDos8Numeros:
 
         btn_voltar = tk.Button(self.root, text="Voltar ao Menu", command=self.menu_inicial)
         btn_voltar.pack(pady=10)
-
-        
-
+      
     def confirmar_tabuleiro(self):
         #Confirma o tabuleiro definido manualmente pelo usuário.
         tabuleiro = []
@@ -231,7 +229,6 @@ class JogoDos8Numeros:
 
             profundidade_busca = len(caminho)
 
-
     def busca_em_profundidade(self):
         custo_de_tempo = 0
         custo_de_espaço = 0
@@ -275,7 +272,6 @@ class JogoDos8Numeros:
 
             custo_de_espaço = max(custo_de_espaço, len(pilha))
             profundidade_busca = max(profundidade_busca, profundidade_atual)
-
     
     def busca_a_estrela(self):
 
@@ -329,7 +325,6 @@ class JogoDos8Numeros:
             custo_de_espaço = max(custo_de_espaço, len(fila))
             profundidade_busca = max(profundidade_busca, len(caminho))
 
-
     def busca_gulosa(self):
 
         custo_de_tempo = 0
@@ -381,7 +376,6 @@ class JogoDos8Numeros:
 
             custo_de_espaço = max(custo_de_espaço, len(fila))
             profundidade_busca = max(profundidade_busca, len(caminho))
-
 
     def animacao_confetes(self):
         for botao in self.botoes:
@@ -458,7 +452,6 @@ class JogoDos8Numeros:
         for botao in self.botoes:
             botao.config(bg="lightgreen")
         self.root.after(1000, self.animacao_confetes)
-
 
     def gerar_relatorio(self):
         for widget in self.root.winfo_children():
