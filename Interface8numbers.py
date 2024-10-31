@@ -10,18 +10,18 @@ class JogoDos8Numeros:
         self.root = root
         self.root.title("Jogo dos 8 Números")
         self.movimentos = 0
-        self.modo_jogo = None  # Pra saber se é jogador ou IA
+        self.modo_jogo = None  # Pra saber se é jogador IA
         self.sequencia_vitoria = [1, 2, 3, 4, 5, 6, 7, 8, '']
         self.caminho_solucao = []  # Caminho da solução
-        self.tabuleiro_inicial = []  # Guarda o estado inicial pro replay
+        self.tabuleiro_inicial = []  
         self.tempo_execucao = {}  # Guarda os tempos de cada busca
         self.tabuleiro = []  
+        self.resultados = [[[],[],[],[],[]], [[],[],[],[],[]], [[],[],[],[],[]], [[],[],[],[],[]]]  # Guarda os resultados das buscas
 
         # Chama o menu inicial
         self.menu_inicial()
 
     def menu_inicial(self):
-        """Menu inicial com as opções de jogo."""
         for widget in self.root.winfo_children():
             widget.destroy()
 
@@ -50,13 +50,13 @@ class JogoDos8Numeros:
         btn_relatorio.pack(pady=10) 
 
     def retorna_estado_inicial(self):
-        """Retorna o estado inicial do tabuleiro."""
+
         self.tabuleiro = self.tabuleiro_inicial[:]
         self.atualizar_botoes() 
         self.menu_inicial()   
 
     def definir_tabuleiro(self):
-        """Permite o usuário definir o tabuleiro manualmente."""
+        #Permite o usuário definir o tabuleiro manualmente.
         for widget in self.root.winfo_children():
             widget.destroy()
 
@@ -82,7 +82,7 @@ class JogoDos8Numeros:
         
 
     def confirmar_tabuleiro(self):
-        """Confirma o tabuleiro definido manualmente pelo usuário."""
+        #Confirma o tabuleiro definido manualmente pelo usuário.
         tabuleiro = []
         for entrada in self.entradas:
             try:
@@ -98,17 +98,17 @@ class JogoDos8Numeros:
         
         if self.eh_resolvivel(tabuleiro):
             self.tabuleiro = tabuleiro
-            self.tabuleiro_inicial = self.tabuleiro[:]  # Guarda o estado inicial pro replay
+            self.tabuleiro_inicial = self.tabuleiro[:]  # guarda o estado inicial 
 
         self.menu_inicial()
 
-    def iniciar_jogo_jogador(self):
-        """Inicia o jogo no modo manual."""
+    def iniciar_jogo_jogador(self):        #Inicia o jogo no modo manual.
+
         self.modo_jogo = 'jogador'
         self.iniciar_jogo()
 
-    def iniciar_jogo_agente(self, tipo_busca):
-        """Inicia o jogo no modo IA (Largura, Profundidade ou A*)."""
+    def iniciar_jogo_agente(self, tipo_busca):      #inicia o jogo no modo IA (Largura, Profundidade ou A*).
+        
         self.modo_jogo = tipo_busca
         self.iniciar_jogo()
 
@@ -122,18 +122,18 @@ class JogoDos8Numeros:
             self.tempo_execucao[self.modo_jogo] = self.registrar_tempo(self.busca_gulosa)
 
     def registrar_tempo(self, func):
-        """Mede o tempo de execução de uma busca."""
+
         inicio = time.time()
         func()
         fim = time.time()
         return fim - inicio
 
     def iniciar_jogo(self):
-        """Prepara o tabuleiro e a interface pro jogo começar."""
+
         self.movimentos = 0
         if self.tabuleiro.count('') != 1:
             self.tabuleiro = self.embaralhar_tabuleiro()
-        self.tabuleiro_inicial = self.tabuleiro[:]  # Guarda o estado inicial pro replay
+        self.tabuleiro_inicial = self.tabuleiro[:]  # guarda o estado inicial
         self.caminho_solucao = []
 
         for widget in self.root.winfo_children():
@@ -189,6 +189,12 @@ class JogoDos8Numeros:
                 self.vitoria()
 
     def busca_em_largura(self):
+        custo_de_tempo = 0 # quantidade de nos visitados
+        custo_de_espaço = 0 # maior quantidade de espaços na fila
+        nos_gerados = 0 # número total de nos gerados
+        profundidade_busca = 0 # profundidade maxima da busca
+        profundidade_solucao = 0 # profundidade da solucao
+
         """Busca em Largura pra resolver o jogo."""
         fila = deque([(self.tabuleiro, [])])
         visitados = set()
@@ -196,21 +202,39 @@ class JogoDos8Numeros:
         while fila:
             estado_atual, caminho = fila.popleft()
             if estado_atual == self.sequencia_vitoria:
+                profundidade_solucao = len(caminho)
                 self.caminho_solucao = caminho
                 self.executar_caminho(caminho)
+                self.resultados[0][0] = custo_de_tempo
+                self.resultados[0][1] = custo_de_espaço
+                self.resultados[0][2] = nos_gerados
+                self.resultados[0][3] = profundidade_busca
+                self.resultados[0][4] = profundidade_solucao
+                print(self.resultados[0])
                 return
+
+            nos_gerados+=1
 
             if tuple(estado_atual) not in visitados:
                 visitados.add(tuple(estado_atual))
+                custo_de_tempo += 1
                 index_vazio = estado_atual.index('')
                 for movimento in self.movimentos_permitidos(index_vazio):
                     novo_estado = estado_atual[:]
                     novo_estado[index_vazio], novo_estado[movimento] = novo_estado[movimento], novo_estado[index_vazio]
                     fila.append((novo_estado, caminho + [movimento]))
 
+            if len(fila) > custo_de_espaço:
+                custo_de_espaço = len(fila)
+
+            profundidade_busca = len(caminho)
+
+
     def busca_em_profundidade(self):
-        """Busca em Profundidade para resolver o jogo."""
-        profundidade_maxima = 20  # Limite para evitar loops infinitos
+    
+        profundidade_maxima = 100  # Limite para evitar loops infinitos
+        arvore_busca = {}
+
 
         def profundidade_limitada(estado_atual, caminho, profundidade):
             """Explora até uma profundidade máxima."""
@@ -232,9 +256,12 @@ class JogoDos8Numeros:
             for movimento in self.movimentos_permitidos(index_vazio):
                 novo_estado = estado_atual[:]
                 novo_estado[index_vazio], novo_estado[movimento] = novo_estado[movimento], novo_estado[index_vazio]
-
                 # Chama a função recursiva se o novo estado ainda não foi visitado
                 if tuple(novo_estado) not in visitados:
+                    arvore_atual = arvore_busca     #cosntrução da árvore de busca
+                    for m in caminho:
+                        arvore_atual = arvore_atual.setdefault(m, {})
+                    arvore_atual[movimento] = novo_estado
                     if profundidade_limitada(novo_estado, caminho + [movimento], profundidade + 1):
                         return True
 
@@ -248,9 +275,9 @@ class JogoDos8Numeros:
 
     
     def busca_a_estrela(self):
-        """Busca A* para resolver o jogo."""
-        def h(estado):
-            """Função heurística: número de peças fora do lugar."""
+
+        def h(estado):           #Função heurística: número de peças fora do lugar.
+
             return sum(1 for i, j in zip(estado, self.sequencia_vitoria) if i != j and i != 0)
 
         # Substitui '' por 0 temporariamente para facilitar a comparação
@@ -282,9 +309,8 @@ class JogoDos8Numeros:
                     heapq.heappush(fila, (novo_custo + h(novo_estado), novo_custo, novo_estado, caminho + [movimento]))
 
     def busca_gulosa(self):
-        """Busca Gulosa para resolver o jogo."""
+
         def h(estado):
-            """Função heurística: número de peças fora do lugar."""
             return sum(1 for i, j in zip(estado, self.sequencia_vitoria) if i != j and i != 0)
 
         # Substitui '' por 0 temporariamente no tabuleiro para facilitar a comparação
@@ -318,7 +344,6 @@ class JogoDos8Numeros:
 
 
     def animacao_confetes(self):
-        """Mostra uma animação de confetes na tela."""
         for botao in self.botoes:
             botao.config(bg="lightgreen")
         for _ in range(100):
@@ -330,7 +355,6 @@ class JogoDos8Numeros:
             self.root.after(100, confete.destroy)
 
     def movimentos_permitidos(self, index_vazio):
-        """Retorna os movimentos permitidos pro vazio."""
         return {
             0: [1, 3], 1: [0, 2, 4], 2: [1, 5],
             3: [0, 4, 6], 4: [1, 3, 5, 7], 5: [2, 4, 8],
@@ -338,7 +362,6 @@ class JogoDos8Numeros:
         }[index_vazio]
 
     def executar_caminho(self, caminho, replay=False):
-        """Executa o caminho da busca. Se for replay, não conta movimentos."""
         self.movimentos_iniciais = self.movimentos  # Guarda a contagem inicial
         for movimento in caminho:
             self.mover(movimento)
@@ -353,20 +376,16 @@ class JogoDos8Numeros:
         opcoes_frame = tk.Frame(self.root)
         opcoes_frame.grid(row=4, column=0, columnspan=3, pady=10)
 
-        btn_replay = tk.Button(opcoes_frame, text="Repetir Caminho (Replay)", command=lambda: self.replay_caminho)
-        btn_replay.pack(side="left", padx=5)
 
         btn_menu = tk.Button(opcoes_frame, text="Voltar ao Menu", command=self.retorna_estado_inicial)
         btn_menu.pack(side="left", padx=5)
 
     def replay_caminho(self):
-        """Refaz o caminho sem contar os movimentos."""
-        self.tabuleiro = self.tabuleiro_inicial[:]  # Restaura o estado inicial
+        self.tabuleiro = self.tabuleiro_inicial[:]
         self.atualizar_botoes()
         self.root.after(500, lambda: self.executar_caminho(self.caminho_solucao, replay=True))
 
     def vitoria(self):
-        """Mostra a animação de vitória com confetes."""
         for botao in self.botoes:
             botao.config(bg="lightgreen")
         self.root.after(1000, self.animacao_confetes)
