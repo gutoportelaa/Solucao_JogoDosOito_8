@@ -415,8 +415,6 @@ class JogoDos8Numeros:
 
         # mostrando os resultados segundo o tipo de busca escolhida
         if self.modo_jogo == 'largura':
-            print(self.resultados[0])
-            resultados = self.resultados[0]
             tk.Label(opcoes_frame, text=f"Tempo de Execução: {resultados[0]} nos visitados").pack()
             tk.Label(opcoes_frame, text=f"Custo de Tempo: {resultados[0]}").pack()
             tk.Label(opcoes_frame, text=f"Custo de Espaço: {resultados[1]}").pack()
