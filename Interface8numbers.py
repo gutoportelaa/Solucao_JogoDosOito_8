@@ -209,29 +209,42 @@ class JogoDos8Numeros:
                     fila.append((novo_estado, caminho + [movimento]))
 
     def busca_em_profundidade(self):
-        """Busca em Profundidade pra resolver o jogo."""
-        def dfs(estado_atual, caminho):
-            """Função recursiva de busca em profundidade."""
+        """Busca em Profundidade para resolver o jogo."""
+        profundidade_maxima = 20  # Limite para evitar loops infinitos
+
+        def profundidade_limitada(estado_atual, caminho, profundidade):
+            """Explora até uma profundidade máxima."""
+            # Verifica se atingiu o estado de vitória
             if estado_atual == self.sequencia_vitoria:
                 self.caminho_solucao = caminho
                 self.executar_caminho(caminho)
                 return True
 
-            if tuple(estado_atual) in visitados or len(caminho) > 20:
+            # Limite de profundidade para evitar loops infinitos
+            if profundidade >= profundidade_maxima:
                 return False
 
+            # Marca o estado atual como visitado
             visitados.add(tuple(estado_atual))
             index_vazio = estado_atual.index('')
+
+            # Explora movimentos possíveis a partir do estado atual
             for movimento in self.movimentos_permitidos(index_vazio):
                 novo_estado = estado_atual[:]
                 novo_estado[index_vazio], novo_estado[movimento] = novo_estado[movimento], novo_estado[index_vazio]
-                if dfs(novo_estado, caminho + [movimento]):
-                    return True
 
+                # Chama a função recursiva se o novo estado ainda não foi visitado
+                if tuple(novo_estado) not in visitados:
+                    if profundidade_limitada(novo_estado, caminho + [movimento], profundidade + 1):
+                        return True
+
+            # Remove o estado atual dos visitados ao retroceder
+            visitados.remove(tuple(estado_atual))
             return False
 
+        # Inicializa o conjunto de estados visitados e executa a busca
         visitados = set()
-        dfs(self.tabuleiro, [])
+        profundidade_limitada(self.tabuleiro, [], 0)
 
     
     def busca_a_estrela(self):
