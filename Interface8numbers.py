@@ -419,32 +419,28 @@ class JogoDos8Numeros:
         # mostrando os resultados segundo o tipo de busca escolhida
         if self.modo_jogo == 'largura':
             resultados = self.resultados[0]
-            tk.Label(opcoes_frame, text=f"Tempo de Execução: {resultados[0]} nos visitados").pack()
-            tk.Label(opcoes_frame, text=f"Custo de Tempo: {resultados[0]}").pack()
+            tk.Label(opcoes_frame, text=f"Custo de Tempo: {resultados[0]} nos visitados").pack()
             tk.Label(opcoes_frame, text=f"Custo de Espaço: {resultados[1]}").pack()
             tk.Label(opcoes_frame, text=f"Nós Gerados: {resultados[2]}").pack()
             tk.Label(opcoes_frame, text=f"Profundidade da Busca: {resultados[3]}").pack()
             tk.Label(opcoes_frame, text=f"Profundidade da Solução: {resultados[4]}").pack()
         elif self.modo_jogo == 'profundidade':
             resultados = self.resultados[1]
-            tk.Label(opcoes_frame, text=f"Tempo de Execução: {resultados[0]} nos visitados").pack()
-            tk.Label(opcoes_frame, text=f"Custo de Tempo: {resultados[0]}").pack()
+            tk.Label(opcoes_frame, text=f"Custo de Tempo: {resultados[0]} nos visitados").pack()
             tk.Label(opcoes_frame, text=f"Custo de Espaço: {resultados[1]}").pack()
             tk.Label(opcoes_frame, text=f"Nós Gerados: {resultados[2]}").pack()
             tk.Label(opcoes_frame, text=f"Profundidade da Busca: {resultados[3]}").pack()
             tk.Label(opcoes_frame, text=f"Profundidade da Solução: {resultados[4]}").pack()
         elif self.modo_jogo == 'a_estrela':
             resultados = self.resultados[2]
-            tk.Label(opcoes_frame, text=f"Tempo de Execução: {resultados[0]} nos visitados").pack()
-            tk.Label(opcoes_frame, text=f"Custo de Tempo: {resultados[0]}").pack()
+            tk.Label(opcoes_frame, text=f"Custo de Tempo: {resultados[0]} nos visitados").pack()
             tk.Label(opcoes_frame, text=f"Custo de Espaço: {resultados[1]}").pack()
             tk.Label(opcoes_frame, text=f"Nós Gerados: {resultados[2]}").pack()
             tk.Label(opcoes_frame, text=f"Profundidade da Busca: {resultados[3]}").pack()
             tk.Label(opcoes_frame, text=f"Profundidade da Solução: {resultados[4]}").pack()
         elif self.modo_jogo == 'gulosa':
             resultados = self.resultados[3]
-            tk.Label(opcoes_frame, text=f"Tempo de Execução: {resultados[0]} nos visitados").pack()
-            tk.Label(opcoes_frame, text=f"Custo de Tempo: {resultados[0]}").pack()
+            tk.Label(opcoes_frame, text=f"Custo de Tempo: {resultados[0]} nos visitados").pack()
             tk.Label(opcoes_frame, text=f"Custo de Espaço: {resultados[1]}").pack()
             tk.Label(opcoes_frame, text=f"Nós Gerados: {resultados[2]}").pack()
             tk.Label(opcoes_frame, text=f"Profundidade da Busca: {resultados[3]}").pack()
@@ -488,7 +484,6 @@ class JogoDos8Numeros:
             elif i == 3:
                 titulo = "Busca Gulosa"
             tk.Label(self.root, text=titulo, font=("Arial", 12, "bold")).pack()
-            tk.Label(self.root, text=f"Tempo de Execução: {resultados[0]} nos visitados").pack()
             tk.Label(self.root, text=f"Custo de Tempo: {resultados[0]}").pack()
             tk.Label(self.root, text=f"Custo de Espaço: {resultados[1]}").pack()
             tk.Label(self.root, text=f"Nós Gerados: {resultados[2]}").pack()
