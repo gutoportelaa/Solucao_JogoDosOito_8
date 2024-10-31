@@ -284,10 +284,10 @@ class JogoDos8Numeros:
         self.nos_fronteira['largura'] = max_fronteira
         self.profundidade_maxima['largura'] = profundidade_maxima
 
-        # Exibe o passo-a-passo da solução encontrada
-        print("\nPasso-a-passo da Solução (Movimentos Executados):")
+        print("\nPasso-a-passo da Solução (Movimentos Executados) - Busca em Profundidade:")
         for passo, movimento in enumerate(self.caminho_solucao, start=1):
             print(f"Passo {passo}: Movimento para posição {movimento}")
+            imprimir_tabuleiro(self.tabuleiro)
 
         # Exibe o relatório detalhado após a execução
         print("\n--- Relatório da Busca em Largura ---")
