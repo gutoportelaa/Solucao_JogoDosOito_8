@@ -249,6 +249,7 @@ class JogoDos8Numeros:
 
             if estado_atual == self.sequencia_vitoria:
                 profundidade_solucao = profundidade_atual
+                profundidade_busca = max(profundidade_busca, profundidade_atual)
                 self.caminho_solucao = caminho
                 self.resultados[1][0] = custo_de_tempo
                 self.resultados[1][1] = custo_de_espaço
@@ -299,6 +300,7 @@ class JogoDos8Numeros:
             
             if estado_atual == sequencia_vitoria_numerica:
                 profundidade_solucao = len(caminho)
+                profundidade_busca = max(profundidade_busca, len(caminho))
                 self.caminho_solucao = caminho
                 self.resultados[2][0] = custo_de_tempo
                 self.resultados[2][1] = custo_de_espaço
@@ -350,6 +352,7 @@ class JogoDos8Numeros:
             # Verifica se o estado atual é o estado de vitória
             if estado_atual == sequencia_vitoria_numerica:
                 profundidade_solucao = len(caminho)
+                profundidade_busca = max(profundidade_busca, len(caminho))
                 self.caminho_solucao = caminho
                 # Restaura a interface do tabuleiro para exibir '' ao invés de 0
                 self.resultados[3][0] = custo_de_tempo

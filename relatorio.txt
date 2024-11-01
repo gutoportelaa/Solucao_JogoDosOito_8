@@ -1,33 +1,29 @@
 Relatório de Desempenho
 Busca em Largura
-Tempo de Execução: 40 nos visitados
-Custo de Tempo: 40
-Custo de Espaço: 47
-Nós Gerados: 62
+Custo de Tempo: 58 nos visitados
+Custo de Espaço: 69
+Nós Gerados: 89
 Profundidade da Busca: 5
 Profundidade da Solução: 5
 
 Busca em Profundidade
-Tempo de Execução: [] nos visitados
-Custo de Tempo: []
-Custo de Espaço: []
-Nós Gerados: []
-Profundidade da Busca: []
-Profundidade da Solução: []
+Custo de Tempo: 193 nos visitados
+Custo de Espaço: 44
+Nós Gerados: 193
+Profundidade da Busca: 50
+Profundidade da Solução: 47
 
 Busca A*
-Tempo de Execução: [] nos visitados
-Custo de Tempo: []
-Custo de Espaço: []
-Nós Gerados: []
-Profundidade da Busca: []
-Profundidade da Solução: []
+Custo de Tempo: 8 nos visitados
+Custo de Espaço: 14
+Nós Gerados: 11
+Profundidade da Busca: 4
+Profundidade da Solução: 5
 
 Busca Gulosa
-Tempo de Execução: [] nos visitados
-Custo de Tempo: []
-Custo de Espaço: []
-Nós Gerados: []
-Profundidade da Busca: []
-Profundidade da Solução: []
+Custo de Tempo: 7 nos visitados
+Custo de Espaço: 15
+Nós Gerados: 8
+Profundidade da Busca: 6
+Profundidade da Solução: 7
 
